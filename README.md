@@ -1,4 +1,4 @@
-# cool-maze
+# Hot Maze
 [Hot Maze](https://hotmaze.io/) is a quick computer-to-mobile share facility, through matrix barcode.
 
 This repo contains (open source):
