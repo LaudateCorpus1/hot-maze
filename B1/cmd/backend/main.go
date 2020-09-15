@@ -14,6 +14,7 @@ import (
 const (
 	projectId               = "hot-maze"
 	storageServiceAccountID = "ephemeral-storage@hot-maze.iam.gserviceaccount.com"
+	bucket                  = "hot-maze.appspot.com"
 )
 
 func main() {
@@ -28,18 +29,13 @@ func main() {
 		log.Fatal("Couldn't read Storage service account private key:", err)
 	}
 
-	// Static assets: HTML, JS, CSS
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "static/index.html")
-	})
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-
 	server := hotmaze.Server{
 		StorageClient:     storageClient,
 		StorageAccountID:  storageServiceAccountID,
 		StoragePrivateKey: storagePrivateKey,
+		StorageBucket:     bucket,
 	}
-	http.HandleFunc("/secure-urls", server.HandlerGenerateSignedURLs)
+	server.RegisterHandlers()
 
 	port := os.Getenv("PORT")
 	if port == "" {

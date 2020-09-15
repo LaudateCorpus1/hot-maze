@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	bucket   = "hot-maze.appspot.com"
 	validity = 300 * time.Second
 )
 
@@ -55,7 +54,7 @@ func (s Server) GenerateURLs(
 	log.Printf("Creating URLs for ephemeral resource %q\n", objectName)
 
 	uploadURL, err = storage.SignedURL(
-		bucket,
+		s.StorageBucket,
 		objectName,
 		&storage.SignedURLOptions{
 			GoogleAccessID: s.StorageAccountID,
@@ -69,7 +68,7 @@ func (s Server) GenerateURLs(
 	}
 
 	downloadURL, err = storage.SignedURL(
-		bucket,
+		s.StorageBucket,
 		objectName,
 		&storage.SignedURLOptions{
 			GoogleAccessID: s.StorageAccountID,
