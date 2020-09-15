@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"cloud.google.com/go/storage"
-	hotmaze "github.com/Deleplace/hot-maze/B1/backend"
+	hotmaze "github.com/Deleplace/hot-maze/B1"
 	"golang.org/x/net/context"
 )
 
@@ -28,13 +28,11 @@ func main() {
 		log.Fatal("Couldn't read Storage service account private key:", err)
 	}
 
-	// storagePrivateKey, err := ioutil.ReadFile("/tmp/hot-maze-9f2d6311662c.pem")
-	// if err != nil {
-	// 	log.Fatal("Couldn't read Storage service account private key:", err)
-	// }
-
-	//
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("../../../web/"))))
+	// Static assets: HTML, JS, CSS
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/index.html")
+	})
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	server := hotmaze.Server{
 		StorageClient:     storageClient,

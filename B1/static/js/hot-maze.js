@@ -3,7 +3,7 @@
 // They are not representative of state-of-the-art frontend practices.
 
 
-// Workflow B1: use Cloud Storae.
+// Workflow B1: use Cloud Storage.
 //
 // 1) The page displays a File input/Drag'n'drop zone
 // 2) The User drops a file F
@@ -14,9 +14,8 @@
 // 8) The mobile downloads F at URL D
 
 // var backend = "https://hot-maze.uc.r.appspot.com";
-// var backend = "https://cool-maze.appspot.com";
-// var backend = "http://localhost:8081";
-var backend = "";
+// Frontend and Backend hosted at the same domain on App Engine.
+var backend = ""; 
 
 let resourceFile;
 let qrText;
