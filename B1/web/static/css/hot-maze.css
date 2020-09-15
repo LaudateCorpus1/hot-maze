@@ -13,13 +13,6 @@ input[readonly]
 }
 
 #progressZone {
-  /* 
-  TODO: make sure you display the progress in the middle
-  of the QR zone, only if the actual QR code is generated
-  after the upload, not before the upload.
-  */
-  margin-top: -160px;
-
   clear: both;
   min-height: 20px;
   padding-bottom: 25px;
@@ -28,6 +21,14 @@ input[readonly]
 #uploadProgress {
   /* Hidden at first. */
   display: none;
+  /* 
+  TODO: make sure you display the progress in the middle
+  of the QR zone, only if the actual QR code is generated
+  after the upload, not before the upload.
+  */
+  margin-top: -160px;
+  margin-bottom: 160px;
+  width: 10em;
 }
 
 #qrZone {
@@ -117,4 +118,14 @@ input[readonly]
   margin-top: 20px;
   border-top: dotted #AAA;
   padding: 1em;
+}
+
+#errorZone {
+  display: none;
+  background-color: #F77;
+  border-radius:2em;
+  padding: 1em;
+  font-size: 2em;
+  font-weight: bold;
+  color: white;
 }

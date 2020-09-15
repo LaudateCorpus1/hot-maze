@@ -118,14 +118,7 @@ function embiggen(event) {
     render("black", embiggen);
 }
 
-window.addEventListener('offline', function(){
-  showError("Lost internet connectivity :(")
-});
-
 function displayGetQrCode() {
-  // We generate the QR-code of a custom "medium-size" shortURL,
-  // much shorter than the full signed GCS download URL.
-
   resourceFile.text().then(text => {
     const limit = 2328; // bytes
     if ( text.length > limit ) {

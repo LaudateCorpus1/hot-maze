@@ -3,17 +3,20 @@
 // They are not representative of state-of-the-art frontend practices.
 
 
-// Simplified workflow, to be adapted depending on the cloud
-// implementation:
+// Workflow B1: use Cloud Storae.
 //
 // 1) The page displays a File input/Drag'n'drop zone
 // 2) The User drops a file F
-// 3) F is uploaded to the cloud
-// 4) The page displays a QR-code containing a URL for F
-// 5) The user scans the QR-code with their mobile
-// 6) The mobile downloads F
+// 4) The page asks the backend for a Signed URLs U, D
+// 5) The page uploads F to U
+// 6) The page encodes and displays D inside a QR-code
+// 7) The user scans the QR-code with their mobile
+// 8) The mobile downloads F at URL D
 
-let backend = "https://TODO";
+// var backend = "https://hot-maze.uc.r.appspot.com";
+// var backend = "https://cool-maze.appspot.com";
+// var backend = "http://localhost:8081";
+var backend = "";
 
 let resourceFile;
 let qrText;
@@ -23,6 +26,7 @@ function showError(errmsg) {
   clearQR();
   freezeResize();
   errorZone.innerHTML = errmsg;
+  errorZone.style.display = "block";
   return false;
 }
 
@@ -42,14 +46,23 @@ function render(colorDark, clickCallback){
     c = h;
 
   clearQR();
-  new QRCode("qrcode", {
-    text: qrText,
-    width: c,
-    height: c,
-    colorDark : colorDark,
-    colorLight : "white",
-    correctLevel : QRCode.CorrectLevel.M
-  });
+  console.log("Rendering QR data ", qrText);
+  console.log(`${qrText.length} characters`);
+  // The limit seems to be 2328 characters.
+  // If the qrText exceeds, we get TypeError: Cannot read property '1' of undefined
+  try {
+    new QRCode("qrcode", {
+      text: qrText,
+      width: c,
+      height: c,
+      colorDark : colorDark,
+      colorLight : "white",
+      correctLevel : QRCode.CorrectLevel.M
+    });
+  } catch(e) {
+    showError("Could not render QR-code: " + e);
+    return;
+  }
 
   // The QR-code contents is clickable to embiggen, not the whole qr-zone
   if (clickCallback)
@@ -112,64 +125,8 @@ function embiggen(event) {
     render("black", embiggen);
 }
 
-window.addEventListener('offline', function(){
-  showError("Lost internet connectivity :(")
-});
-
-
-function checkInternetAndExecute(action){
-  action();
-  return;
-  // TODO implement the check below, at a proper endpoint
-
-  // This request is supposed to be fast.
-  var tinyRequest = new XMLHttpRequest();
-  tinyRequest.onreadystatechange = function() {
-      if (tinyRequest.readyState == 4 ) {
-        if (tinyRequest.status == 200) {
-          // Response ensures we have internet connectivity
-          action();
-        } else {
-          showError("No internet...?");
-        }
-      }
-  };
-  tinyRequest.open("GET", backend+"/online", true);
-  tinyRequest.send( null );
-}
-
-function doUpload(action) {          
-  uploadProgress.value = 0.0;
-  
-  // This is a fake upload.
-  // TODO: Replace with actual upload to cloud.
-  let uploadTime = (0.5 + 2*Math.random()) * 1000;
-  let incr = 100;
-  let t = 0;
-  let nextStep;
-  nextStep = function() {
-    setTimeout(function() {
-      t += incr;
-      let ratio = Math.min(t/uploadTime, 1.0);
-      uploadProgress.value = ratio;
-      if(t>=uploadTime) {
-        setTimeout(function() {
-          formZone.style.display = "none";
-          uploadProgress.style.display = "none";
-          action();
-        }, 380);
-        return;
-      }
-      nextStep();
-    }, incr)
-  }
-  nextStep();
-}
-
 function displayGetQrCode() {
-  // This is a fake download URL.
-  // TODO: replace with fresh URL to cloud file location.
-  qrText = "never gonna give you up never gonna let you down";
+  formZone.style.display = "none";
   render("black", embiggen);
 }
 
@@ -178,10 +135,11 @@ function processResourceFile() {
    // or through a drag'n'drop.
    // What happens next with resourceFile is the same in both use cases.
 
-   fileForm.style.display = "none";
-   uploadProgress.style.display = "inline";
-   resourceUpload.classList.add("transfering");
-   doUpload( displayGetQrCode );
+   requestGcsUrls()
+    .catch(showError)
+    .then(doUpload)
+    .catch(showError)
+    .then(displayGetQrCode);
 }
 
 resourceInput.onchange = function(e) { 
@@ -239,13 +197,33 @@ function handleDnd(){
   }, false);
 }
 
+async function requestGcsUrls() {
+  console.log("requestGcsUrls");
+  let endpoint = `${backend}/secure-urls`;
+  let params = `filetype=${encodeURIComponent(resourceFile.type)}`
+               + `&filesize=${resourceFile.size}`
+               + `&filename=${encodeURIComponent(resourceFile.name)}`;
+  let url = `${endpoint}?${params}`
+  return fetch(url, {method:"POST"})
+    .catch(showError)
+    .then(response => response.json());
+}
+
+async function doUpload(gcsUrls) {
+  console.debug("URL GET =", gcsUrls.downloadURL);
+  qrText = gcsUrls.downloadURL;
+  console.debug("URL PUT =", gcsUrls.uploadURL);
+  return fetch(gcsUrls.uploadURL, {
+      method:"PUT",
+      headers: {
+        'Content-Type': resourceFile.type
+      }, 
+      body: resourceFile
+    });
+}
+
 //
 // Let's start: init, then wait for user file selection.
 //
 
 handleDnd();
-
-checkInternetAndExecute(function(){
-  // Unlock upload widgets, only if we do have internet!
-  formZone.style.display = "block";
-});
