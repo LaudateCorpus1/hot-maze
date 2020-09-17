@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"cloud.google.com/go/storage"
 	hotmaze "github.com/Deleplace/hot-maze/B1"
@@ -12,9 +13,10 @@ import (
 )
 
 const (
-	projectId               = "hot-maze"
+	projectID               = "hot-maze"
 	storageServiceAccountID = "ephemeral-storage@hot-maze.iam.gserviceaccount.com"
 	bucket                  = "hot-maze.appspot.com"
+	fileDeleteAfter         = 9 * time.Minute
 )
 
 func main() {
@@ -30,10 +32,13 @@ func main() {
 	}
 
 	server := hotmaze.Server{
-		StorageClient:     storageClient,
-		StorageAccountID:  storageServiceAccountID,
-		StoragePrivateKey: storagePrivateKey,
-		StorageBucket:     bucket,
+		GCPProjectID:        projectID,
+		StorageClient:       storageClient,
+		StorageAccountID:    storageServiceAccountID,
+		StoragePrivateKey:   storagePrivateKey,
+		StorageBucket:       bucket,
+		StorageFileTTL:      fileDeleteAfter,
+		CloudTasksQueuePath: "projects/hot-maze/locations/us-central1/queues/file-expiry",
 	}
 	server.RegisterHandlers()
 
