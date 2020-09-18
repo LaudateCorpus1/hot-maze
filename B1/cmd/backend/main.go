@@ -13,7 +13,10 @@ import (
 )
 
 const (
-	projectID               = "hot-maze"
+	projectID = "hot-maze"
+	// "b1" is the version of this App Engine app
+	// "uc.r" is the app location (regional route)
+	backendBaseURL          = "https://b1-dot-hot-maze.uc.r.appspot.com"
 	storageServiceAccountID = "ephemeral-storage@hot-maze.iam.gserviceaccount.com"
 	bucket                  = "hot-maze.appspot.com"
 	fileDeleteAfter         = 9 * time.Minute
@@ -33,6 +36,7 @@ func main() {
 
 	server := hotmaze.Server{
 		GCPProjectID:        projectID,
+		BackendBaseURL:      backendBaseURL,
 		StorageClient:       storageClient,
 		StorageAccountID:    storageServiceAccountID,
 		StoragePrivateKey:   storagePrivateKey,

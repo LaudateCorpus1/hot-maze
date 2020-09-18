@@ -11,6 +11,8 @@ import (
 type Server struct {
 	GCPProjectID string
 
+	BackendBaseURL string
+
 	StorageClient *storage.Client
 
 	// Service account email e.g. "ephemeral-storage@hot-maze.iam.gserviceaccount.com"
@@ -38,5 +40,6 @@ func (s Server) RegisterHandlers() {
 
 	// Backend logic
 	http.HandleFunc("/secure-urls", s.HandlerGenerateSignedURLs)
+	http.HandleFunc("/get/", s.HandlerUnshortenGetURL)
 	http.HandleFunc("/forget", s.HandlerForgetFile)
 }

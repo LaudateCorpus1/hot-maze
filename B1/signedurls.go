@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -82,7 +83,22 @@ func (s Server) GenerateURLs(
 		return
 	}
 
-	downloadURL, err = storage.SignedURL(
+	// Instead of the full download signed URL which is too big to fit
+	// comfortably in a QR-code, we return a short voucher instead.
+	downloadURL = s.BackendBaseURL + "/get/" + fileUUID
+
+	return
+}
+
+// HandlerUnshortenGetURL redirects a "short" URL to a "long" signed URL.
+// Short URL has length ~80.
+// Signed download URL has length ~550.
+func (s Server) HandlerUnshortenGetURL(w http.ResponseWriter, r *http.Request) {
+	fileUUID := strings.TrimPrefix(r.URL.Path, "/get/")
+	objectName := "transit/" + fileUUID
+	log.Printf("Redirecting to a new downlaod signed URL for ephemeral resource %q\n", objectName)
+
+	downloadURL, err := storage.SignedURL(
 		s.StorageBucket,
 		objectName,
 		&storage.SignedURLOptions{
@@ -91,6 +107,11 @@ func (s Server) GenerateURLs(
 			Method:         "GET",
 			Expires:        time.Now().Add(validity),
 		})
+	if err != nil {
+		log.Println("generating download signed URL:", err)
+		http.Error(w, "Could not generate download signed URL :(", http.StatusInternalServerError)
+		return
+	}
 
-	return
+	http.Redirect(w, r, downloadURL, http.StatusFound)
 }
