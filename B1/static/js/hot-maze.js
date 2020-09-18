@@ -138,6 +138,7 @@ function processResourceFile() {
     .catch(showError)
     .then(doUpload)
     .catch(showError)
+    .then(progressSuccess)
     .then(displayGetQrCode);
 }
 
@@ -197,7 +198,8 @@ function handleDnd(){
 }
 
 async function requestGcsUrls() {
-  console.log("requestGcsUrls");
+  console.debug("requestGcsUrls");
+  fileForm.style.display = "none";
   let endpoint = `${backend}/secure-urls`;
   let params = `filetype=${encodeURIComponent(resourceFile.type)}`
                + `&filesize=${resourceFile.size}`
@@ -212,13 +214,50 @@ async function doUpload(gcsUrls) {
   console.debug("URL GET =", gcsUrls.downloadURL);
   qrText = gcsUrls.downloadURL;
   console.debug("URL PUT =", gcsUrls.uploadURL);
-  return fetch(gcsUrls.uploadURL, {
-      method:"PUT",
-      headers: {
-        'Content-Type': resourceFile.type
-      }, 
-      body: resourceFile
+  uploadProgress.style.display = "inline";
+  uploadProgress.value = 0.05;
+
+  // XMLHttpRequest instead of fetch: be cause we use
+  // the 'progress' event.
+  return new Promise(function (resolve, reject) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("PUT", gcsUrls.uploadURL);
+    xhr.onload = function () {
+      if (this.status >= 200 && this.status < 300) {
+        resolve(xhr.response);
+      } else {
+        reject({
+          status: this.status,
+          statusText: xhr.statusText
+        });
+      }
+    };
+    xhr.onerror = function () {
+      reject({
+        status: this.status,
+        statusText: xhr.statusText
+      });
+    };
+    (xhr.upload || xhr).addEventListener('progress', function(e) {
+        var done = e.position || e.loaded;
+        var total = e.totalSize || e.total;
+        var ratio = done/total;
+        console.debug("Upload ratio:", ratio);
+        uploadProgress.value = 0.05 + 0.85*ratio;
     });
+    xhr.setRequestHeader("Content-Type", resourceFile.type);
+    if(resourceFile.name) {
+      xhr.setRequestHeader("Content-Disposition", `filename="${encodeURIComponent(resourceFile.name)}"`);
+    }
+    xhr.send(resourceFile);
+  });
+}
+
+async function progressSuccess() {
+  uploadProgress.value = 1;
+  window.setTimeout( () => {
+    uploadProgress.style.display = "none";
+  }, 800);
 }
 
 //
