@@ -46,7 +46,7 @@ function render(colorDark, clickCallback){
 
   clearQR();
   console.log("Rendering QR data ", qrText);
-  console.log(`${qrText.length} characters`);
+  console.debug(`${qrText.length} characters`);
   // The limit seems to be 2328 characters.
   // If the qrText exceeds, we get TypeError: Cannot read property '1' of undefined
   try {
@@ -126,6 +126,7 @@ function embiggen(event) {
 
 function displayGetQrCode() {
   formZone.style.display = "none";
+  animShow(qrZone, 800);
   render("black", embiggen);
 }
 
@@ -199,12 +200,16 @@ function handleDnd(){
 
 async function requestGcsUrls() {
   console.debug("requestGcsUrls");
-  fileForm.style.display = "none";
+  animHide(fileForm, 400);
+  uploadProgress.style.display = "inline";
+  uploadProgress.value = 0.02;
+  animShow(uploadProgress, 600);
+
   let endpoint = `${backend}/secure-urls`;
   let params = `filetype=${encodeURIComponent(resourceFile.type)}`
                + `&filesize=${resourceFile.size}`
                + `&filename=${encodeURIComponent(resourceFile.name)}`;
-  let url = `${endpoint}?${params}`
+  let url = `${endpoint}?${params}`;
   return fetch(url, {method:"POST"})
     .catch(showError)
     .then(response => response.json());
@@ -255,10 +260,33 @@ async function doUpload(gcsUrls) {
 
 async function progressSuccess() {
   uploadProgress.value = 1;
-  window.setTimeout( () => {
-    uploadProgress.style.display = "none";
-  }, 800);
+  animHide(uploadProgress, 1500)
 }
+
+function animShow(element, duration) {
+  duration = duration || 300;
+  element.animate([
+    { opacity: 0 }, 
+    { opacity: 1 } 
+  ], { 
+    duration: duration,
+    easing: "ease-in-out",
+    fill: "forwards"
+  });
+}
+
+function animHide(element, duration) {
+  duration = duration || 300;
+  element.animate([
+    { opacity: 1 }, 
+    { opacity: 0, display: "none" } 
+  ], { 
+    duration: duration,
+    easing: "ease-in-out",
+    fill: "forwards"
+  });
+}
+
 
 //
 // Let's start: init, then wait for user file selection.
