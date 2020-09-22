@@ -1,0 +1,22 @@
+[
+  {
+    "method": [
+      "GET",
+      "PUT"
+    ],
+    "origin": [
+      "https://hot-maze.uc.r.appspot.com",
+      "https://b1-dot-hot-maze.uc.r.appspot.com",
+      "https://b1-large-qr-dot-hot-maze.uc.r.appspot.com",
+      "https://hot-maze.appspot.com",
+      "https://b1-dot-hot-maze.appspot.com",
+      "https://b1-large-qr-dot-hot-maze.appspot.com",
+      "http://localhost:8080",
+      "http://localhost:8081"
+    ],
+    "responseHeader": [
+      "Content-Type",
+      "Content-Disposition"
+    ]
+  }
+]
