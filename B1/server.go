@@ -36,6 +36,9 @@ func (s Server) RegisterHandlers() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "static/index.html")
 	})
+	http.HandleFunc("/terms.html", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/terms.html")
+	})
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	// Backend logic
