@@ -8,6 +8,7 @@ import (
 	"time"
 
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
+	"cloud.google.com/go/storage"
 	taskspb "google.golang.org/genproto/googleapis/cloud/tasks/v2"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -34,7 +35,10 @@ func (s Server) HandlerForgetFile(w http.ResponseWriter, r *http.Request) {
 	objectName := "transit/" + fileUUID
 	log.Println("Forgetting file", objectName)
 	err := s.StorageClient.Bucket(s.StorageBucket).Object(objectName).Delete(r.Context())
-	if err != nil {
+	switch {
+	case err == storage.ErrObjectNotExist:
+		log.Println("File", objectName, "did not exist")
+	case err != nil:
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

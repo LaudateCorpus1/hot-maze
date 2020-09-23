@@ -8,6 +8,7 @@ import (
 	"time"
 
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
+	"cloud.google.com/go/storage"
 	taskspb "google.golang.org/genproto/googleapis/cloud/tasks/v2"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -15,13 +16,6 @@ import (
 func (s Server) HandlerForgetFile(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "POST only", http.StatusBadRequest)
-		return
-	}
-
-	if taskName := r.Header.Get("X-Appengine-Taskname"); taskName == "" {
-		// Validate the request comes from Cloud Tasks.
-		log.Println("Invalid Task: No X-Appengine-Taskname request header found")
-		http.Error(w, "Bad Request - Invalid Task", http.StatusBadRequest)
 		return
 	}
 
@@ -34,14 +28,17 @@ func (s Server) HandlerForgetFile(w http.ResponseWriter, r *http.Request) {
 	objectName := "transit/" + fileUUID
 	log.Println("Forgetting file", objectName)
 	err := s.StorageClient.Bucket(s.StorageBucket).Object(objectName).Delete(r.Context())
-	if err != nil {
+	switch {
+	case err == storage.ErrObjectNotExist:
+		log.Println("File", objectName, "did not exist")
+	case err != nil:
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
 func (s Server) ScheduleForgetFile(ctx context.Context, fileUUID string) (*taskspb.Task, error) {
-	// Adapted from https://cloud.google.com/tasks/docs/creating-appengine-tasks#go
+	// Adapted from https://cloud.google.com/tasks/docs/creating-http-target-tasks#go
 
 	client, err := cloudtasks.NewClient(ctx)
 	if err != nil {
@@ -54,11 +51,10 @@ func (s Server) ScheduleForgetFile(ctx context.Context, fileUUID string) (*tasks
 	req := &taskspb.CreateTaskRequest{
 		Parent: s.CloudTasksQueuePath,
 		Task: &taskspb.Task{
-			// https://godoc.org/google.golang.org/genproto/googleapis/cloud/tasks/v2#AppEngineHttpRequest
-			MessageType: &taskspb.Task_AppEngineHttpRequest{
-				AppEngineHttpRequest: &taskspb.AppEngineHttpRequest{
-					HttpMethod:  taskspb.HttpMethod_POST,
-					RelativeUri: "/forget?uuid=" + fileUUID,
+			MessageType: &taskspb.Task_HttpRequest{
+				HttpRequest: &taskspb.HttpRequest{
+					HttpMethod: taskspb.HttpMethod_POST,
+					Url:        s.BackendBaseURL + "/B2_Forget?uuid=" + fileUUID,
 				},
 			},
 			ScheduleTime: &timestamppb.Timestamp{

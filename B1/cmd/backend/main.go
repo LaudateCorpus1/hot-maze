@@ -42,7 +42,7 @@ func main() {
 		StoragePrivateKey:   storagePrivateKey,
 		StorageBucket:       bucket,
 		StorageFileTTL:      fileDeleteAfter,
-		CloudTasksQueuePath: "projects/hot-maze/locations/us-central1/queues/file-expiry",
+		CloudTasksQueuePath: "projects/hot-maze/locations/us-central1/queues/b1-file-expiry",
 	}
 	server.RegisterHandlers()
 
