@@ -18,7 +18,6 @@ const (
 )
 
 func (s Server) HandlerGenerateSignedURLs(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "localhost:*")
 	if errCORS := s.accessControlAllowHotMaze(w, r); errCORS != nil {
 		log.Println(errCORS)
 		http.Error(w, errCORS.Error(), http.StatusBadRequest)

@@ -5,6 +5,7 @@
       "PUT"
     ],
     "origin": [
+      "https://hotmaze.io",
       "https://hot-maze.uc.r.appspot.com",
       "https://b1-dot-hot-maze.uc.r.appspot.com",
       "https://b1-large-qr-dot-hot-maze.uc.r.appspot.com",
