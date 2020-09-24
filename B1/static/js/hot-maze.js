@@ -75,7 +75,9 @@ window.onresize = function(){
     if (resizeTimeOut != null)
         clearTimeout(resizeTimeOut);
     resizeTimeOut = setTimeout(function(){
-        render("black", embiggen);
+        if(qrText) {
+          render("black", embiggen);
+        }
     }, 300);
 };
 function freezeResize(){
