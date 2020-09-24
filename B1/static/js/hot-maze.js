@@ -130,6 +130,20 @@ function displayGetQrCode() {
   formZone.style.display = "none";
   animShow(qrZone, 800);
   render("black", embiggen);
+
+  let minutesAvailable = 9;  // Expires after 9mn
+  let expi = new Date(new Date().getTime() + minutesAvailable*60000);
+  let hh = expi.getHours();
+  let mm = ('0'+expi.getMinutes()).slice(-2);
+  let displayExpi = `${hh}:${mm}`;
+  expirationZone.innerHTML = `
+    <p>Resource will be available for a few minutes only.</p>
+    <p>It will expire at ${displayExpi}.</p>
+  `;
+  window.setTimeout( () => {
+    qrcode.style.visibility = 'hidden';
+    expirationZone.innerText = `Resource has expired.`
+  }, minutesAvailable*60000);
 }
 
 function processResourceFile() {
