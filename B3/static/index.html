@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Hot Maze - Send your document from computer to mobile</title>
+  <script src="static/js/qrcodejs/qrcode.js"></script>
+  <link rel="SHORTCUT ICON" href="static/img/hotmaze_128.png">
+  <link rel="stylesheet" href="static/css/hot-maze.css" />
+</head>
+
+
+<body>
+  <div id="help">
+    <div><span id="questionMark">?</span></div>
+    <div id="helpContents" style="display: none;">
+      <div id="helpClose">🗙</div>
+      <img src="static/img/schema_hot.png" width="296" class="right" />
+      <p>You can share a document from your computer to your mobile in seconds</p>
+      <ol>
+        <li>Drop a file on this page</li>
+        <li>Scan the QR-code with your mobile</li>
+      </ol>
+      <p>Your mobile device must have a QR-code reader (get one <a href="https://play.google.com/store/search?q=QR%20reader" target="_blank">for Android</a>, or <a href="https://itunes.apple.com/app/qr-code-reader-and-scanner/id388175979?mt=8" target="_blank">for iOS</a>).</p>
+      <p>The two devices (source and target) must have an internet connection.</p>
+      <p><strong>Your data remains private</strong>. It is not publicly available and not disclosed to third parties. See the <a href="terms.html">Privacy terms</a>.</p>
+
+      <div class="link-to-dual">
+      But I want to send from mobile to desktop instead! Use <a href="https://coolmaze.io/">Cool Maze</a>.
+      </div>
+    </div>
+  </div>
+
+  <div id="formZone">
+    <div id="resourceUpload"> 
+      <form id="fileForm"> 
+        <div id="dropInvite" style="display: none;">DROP FILE HERE</div>
+        <input type="file" name="resourceInput" id="resourceInput" />
+      </form>
+    </div>
+  </div>
+
+  <div id="qrZone">
+    <div id="qrcode"> 
+    </div>
+  </div>
+
+  <div id="progressZone">
+      <progress value="0" id="uploadProgress"></progress>
+  </div>
+
+  <div id="errorZone">
+  </div>
+
+  <div id="expirationZone">
+  </div>
+
+  <script src="static/js/hot-maze.js"></script>
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    
+    ga('create', 'UA-40444778-5', 'auto');
+    ga('send', 'pageview');
+  </script>
+</body>
+</html>

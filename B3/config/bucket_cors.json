@@ -1,0 +1,24 @@
+[
+  {
+    "method": [
+      "GET",
+      "PUT"
+    ],
+    "origin": [
+      "https://hotmaze.io",
+      "https://hot-maze.uc.r.appspot.com",
+      "https://b1-dot-hot-maze.uc.r.appspot.com",
+      "https://b1-large-qr-dot-hot-maze.uc.r.appspot.com",
+      "https://hot-maze.appspot.com",
+      "https://b1-dot-hot-maze.appspot.com",
+      "https://b1-large-qr-dot-hot-maze.appspot.com",
+      "https://hot-maze.firebaseapp.com",
+      "https://hot-maze-udtcugbenq-uc.a.run.app",
+      "http://localhost:8080"
+    ],
+    "responseHeader": [
+      "Content-Type",
+      "Content-Disposition"
+    ]
+  }
+]
