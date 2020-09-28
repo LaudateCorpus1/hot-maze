@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	"cloud.google.com/go/firestore"
 	hotmaze "github.com/Deleplace/hot-maze/C1"
 )
@@ -24,16 +25,24 @@ const (
 
 func main() {
 	ctx := context.Background()
+
 	fsClient, err := firestore.NewClient(ctx, projectID)
 	if err != nil {
-		log.Fatalln("Problem accessing Firestore :(")
+		log.Fatalf("Problem accessing Firestore: %v\n", err)
 	}
 	defer fsClient.Close()
+
+	tasksClient, err := cloudtasks.NewClient(ctx)
+	if err != nil {
+		log.Fatalf("Problem accessing Cloud Tasks: %v\n", err)
+	}
+	defer tasksClient.Close()
 
 	server := hotmaze.Server{
 		GCPProjectID:        projectID,
 		BackendBaseURL:      backendBaseURL,
 		FirestoreClient:     fsClient,
+		TasksClient:         tasksClient,
 		StorageFileTTL:      fileDeleteAfter,
 		CloudTasksQueuePath: "projects/hot-maze/locations/us-central1/queues/c1-file-expiry",
 	}

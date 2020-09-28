@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	taskspb "google.golang.org/genproto/googleapis/cloud/tasks/v2"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -43,12 +42,6 @@ func (s Server) HandlerForgetFile(w http.ResponseWriter, r *http.Request) {
 func (s Server) ScheduleForgetFile(ctx context.Context, fileUUID string) (*taskspb.Task, error) {
 	// Adapted from https://cloud.google.com/tasks/docs/creating-appengine-tasks#go
 
-	client, err := cloudtasks.NewClient(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("cloudtasks.NewClient: %v", err)
-	}
-	defer client.Close()
-
 	// Build the Task payload.
 	// https://godoc.org/google.golang.org/genproto/googleapis/cloud/tasks/v2#CreateTaskRequest
 	req := &taskspb.CreateTaskRequest{
@@ -67,7 +60,7 @@ func (s Server) ScheduleForgetFile(ctx context.Context, fileUUID string) (*tasks
 		},
 	}
 
-	createdTask, err := client.CreateTask(ctx, req)
+	createdTask, err := s.TasksClient.CreateTask(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("CreateTask: %v", err)
 	}

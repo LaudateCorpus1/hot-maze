@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	"cloud.google.com/go/firestore"
 )
 
@@ -14,6 +15,8 @@ type Server struct {
 	BackendBaseURL string
 
 	FirestoreClient *firestore.Client
+
+	TasksClient *cloudtasks.Client
 
 	StorageFileTTL time.Duration
 
