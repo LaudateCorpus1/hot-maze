@@ -3,6 +3,8 @@ package hotmaze
 import (
 	"net/http"
 	"time"
+
+	"cloud.google.com/go/firestore"
 )
 
 // Server encapsulates the Hot Maze backend.
@@ -10,6 +12,8 @@ type Server struct {
 	GCPProjectID string
 
 	BackendBaseURL string
+
+	FirestoreClient *firestore.Client
 
 	StorageFileTTL time.Duration
 

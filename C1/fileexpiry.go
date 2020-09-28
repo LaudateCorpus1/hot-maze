@@ -8,7 +8,6 @@ import (
 	"time"
 
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
-	"cloud.google.com/go/firestore"
 	taskspb "google.golang.org/genproto/googleapis/cloud/tasks/v2"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -33,14 +32,7 @@ func (s Server) HandlerForgetFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("Deleting resource C1/" + fileUUID + " from Firestore")
-	ctx := context.Background()
-	fsClient, err := firestore.NewClient(ctx, s.GCPProjectID)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, "Problem accessing Firestore :(", http.StatusInternalServerError)
-		return
-	}
-	_, errDelete := fsClient.Doc("C1/" + fileUUID).Delete(ctx)
+	_, errDelete := s.FirestoreClient.Doc("C1/" + fileUUID).Delete(r.Context())
 	if errDelete != nil {
 		log.Println(errDelete)
 		http.Error(w, "Problem deleting a resource from Firestore :(", http.StatusInternalServerError)

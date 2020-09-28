@@ -1,14 +1,12 @@
 package hotmaze
 
 import (
-	"context"
 	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
 
-	"cloud.google.com/go/firestore"
 	"github.com/google/uuid"
 )
 
@@ -44,14 +42,7 @@ func (s Server) HandlerUpload(w http.ResponseWriter, r *http.Request) {
 	fileUUID := uuid.New().String()
 	log.Println("Saving with UUID", fileUUID)
 
-	ctx := context.Background()
-	fsClient, err := firestore.NewClient(ctx, s.GCPProjectID)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, "Problem accessing Firestore :(", http.StatusInternalServerError)
-		return
-	}
-	_, errCreate := fsClient.Doc("C1/"+fileUUID).Create(ctx, map[string]interface{}{
+	_, errCreate := s.FirestoreClient.Doc("C1/"+fileUUID).Create(r.Context(), map[string]interface{}{
 		"data": fileData,
 		"type": contentType,
 	})
@@ -61,7 +52,7 @@ func (s Server) HandlerUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = s.ScheduleForgetFile(ctx, fileUUID)
+	_, err = s.ScheduleForgetFile(r.Context(), fileUUID)
 	if err != nil {
 		log.Println("scheduling file expiry:", err)
 		// Better fail now, than keeping a user file forever in Firestore

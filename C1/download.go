@@ -1,12 +1,10 @@
 package hotmaze
 
 import (
-	"context"
 	"log"
 	"net/http"
 	"strings"
 
-	"cloud.google.com/go/firestore"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -16,14 +14,7 @@ func (s Server) HandlerDownload(w http.ResponseWriter, r *http.Request) {
 	fileUUID := strings.TrimPrefix(r.URL.Path, "/get/")
 	log.Printf("Reading file %q\n", fileUUID)
 
-	ctx := context.Background()
-	fsClient, err := firestore.NewClient(ctx, s.GCPProjectID)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, "Problem accessing Firestore :(", http.StatusInternalServerError)
-		return
-	}
-	doc, errGet := fsClient.Doc("C1/" + fileUUID).Get(ctx)
+	doc, errGet := s.FirestoreClient.Doc("C1/" + fileUUID).Get(r.Context())
 	if status.Code(errGet) == codes.NotFound {
 		log.Println("C1/" + fileUUID + " not found")
 		http.Error(w, "Resource not found", http.StatusNotFound)
