@@ -96,7 +96,7 @@ func (s Server) HandlerUnshortenGetURL(w http.ResponseWriter, r *http.Request) {
 	parts := strings.Split(r.URL.Path, "/")
 	fileUUID := parts[len(parts)-1]
 	objectName := "transit/" + fileUUID
-	log.Printf("Redirecting to a new downlaod signed URL for ephemeral resource %q\n", objectName)
+	log.Printf("Redirecting to a new download signed URL for ephemeral resource %q\n", objectName)
 
 	downloadURL, err := storage.SignedURL(
 		s.StorageBucket,

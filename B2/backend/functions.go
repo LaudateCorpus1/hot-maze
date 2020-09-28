@@ -31,7 +31,7 @@ func init() {
 
 	storagePrivateKey, errSecret := AccessSecretVersion("projects/230384242501/secrets/B2-storage-private-key/versions/latest")
 	if errSecret != nil {
-		log.Fatal("Couldn't read Storage service account private key:", err)
+		log.Fatal("Couldn't read Storage service account private key:", errSecret)
 	}
 
 	server = Server{
