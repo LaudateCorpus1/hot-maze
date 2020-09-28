@@ -63,6 +63,9 @@ func (s Server) ScheduleForgetFile(ctx context.Context, fileUUID string) (*tasks
 				AppEngineHttpRequest: &taskspb.AppEngineHttpRequest{
 					HttpMethod:  taskspb.HttpMethod_POST,
 					RelativeUri: "/forget?uuid=" + fileUUID,
+					AppEngineRouting: &taskspb.AppEngineRouting{
+						Version: "b1",
+					},
 				},
 			},
 			ScheduleTime: &timestamppb.Timestamp{
