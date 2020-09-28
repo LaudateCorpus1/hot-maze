@@ -1,0 +1,84 @@
+package hotmaze
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"net/http"
+	"time"
+
+	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
+	"cloud.google.com/go/firestore"
+	taskspb "google.golang.org/genproto/googleapis/cloud/tasks/v2"
+	"google.golang.org/protobuf/types/known/timestamppb"
+)
+
+func (s Server) HandlerForgetFile(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "POST only", http.StatusBadRequest)
+		return
+	}
+
+	if taskName := r.Header.Get("X-Appengine-Taskname"); taskName == "" {
+		// Validate the request comes from Cloud Tasks.
+		log.Println("Invalid Task: No X-Appengine-Taskname request header found")
+		http.Error(w, "Bad Request - Invalid Task", http.StatusBadRequest)
+		return
+	}
+
+	fileUUID := r.FormValue("uuid")
+	if fileUUID == "" {
+		http.Error(w, "please provide file uuid", http.StatusBadRequest)
+		return
+	}
+
+	log.Println("Deleting resource C1/" + fileUUID + " from Firestore")
+	ctx := context.Background()
+	fsClient, err := firestore.NewClient(ctx, s.GCPProjectID)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Problem accessing Firestore :(", http.StatusInternalServerError)
+		return
+	}
+	_, errDelete := fsClient.Doc("C1/" + fileUUID).Delete(ctx)
+	if errDelete != nil {
+		log.Println(errDelete)
+		http.Error(w, "Problem deleting a resource from Firestore :(", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (s Server) ScheduleForgetFile(ctx context.Context, fileUUID string) (*taskspb.Task, error) {
+	// Adapted from https://cloud.google.com/tasks/docs/creating-appengine-tasks#go
+
+	client, err := cloudtasks.NewClient(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("cloudtasks.NewClient: %v", err)
+	}
+	defer client.Close()
+
+	// Build the Task payload.
+	// https://godoc.org/google.golang.org/genproto/googleapis/cloud/tasks/v2#CreateTaskRequest
+	req := &taskspb.CreateTaskRequest{
+		Parent: s.CloudTasksQueuePath,
+		Task: &taskspb.Task{
+			// https://godoc.org/google.golang.org/genproto/googleapis/cloud/tasks/v2#AppEngineHttpRequest
+			MessageType: &taskspb.Task_AppEngineHttpRequest{
+				AppEngineHttpRequest: &taskspb.AppEngineHttpRequest{
+					HttpMethod:  taskspb.HttpMethod_POST,
+					RelativeUri: "/forget?uuid=" + fileUUID,
+				},
+			},
+			ScheduleTime: &timestamppb.Timestamp{
+				Seconds: time.Now().Add(s.StorageFileTTL).Unix(),
+			},
+		},
+	}
+
+	createdTask, err := client.CreateTask(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("CreateTask: %v", err)
+	}
+
+	return createdTask, nil
+}

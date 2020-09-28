@@ -3,17 +3,16 @@
 // They are not representative of state-of-the-art frontend practices.
 
 
-// Workflow B1: use Cloud Storage.
+// Workflow C1: use Cloud Storage.
 //
 // 1) The page displays a File input/Drag'n'drop zone
 // 2) The User drops a file F
-// 4) The page asks the backend for a Signed URLs U, D
-// 5) The page uploads F to U
-// 6) The page encodes and displays D inside a QR-code
-// 7) The user scans the QR-code with their mobile
-// 8) The mobile downloads F at URL D
+// 3) The page uploads F and receives a download URL D
+// 4) The page encodes and displays D inside a QR-code
+// 5) The user scans the QR-code with their mobile
+// 6) The mobile downloads F at URL D
 
-// var backend = "https://b1-dot-hot-maze.uc.r.appspot.com";
+// var backend = "https://c1-dot-hot-maze.uc.r.appspot.com";
 // Frontend and Backend hosted at the same domain on App Engine.
 var backend = ""; 
 
@@ -151,12 +150,12 @@ function processResourceFile() {
    // or through a drag'n'drop.
    // What happens next with resourceFile is the same in both use cases.
 
-   requestGcsUrls()
+   doUpload()
     .catch(showError)
-    .then(doUpload)
-    .catch(showError)
-    .then(progressSuccess)
-    .then(displayGetQrCode);
+    .then( uploadResponse => {
+      qrText = uploadResponse.downloadURL;
+      progressSuccess();
+    }).then(displayGetQrCode);
 }
 
 resourceInput.onchange = function(e) { 
@@ -214,27 +213,7 @@ function handleDnd(){
   }, false);
 }
 
-async function requestGcsUrls() {
-  console.debug("requestGcsUrls");
-  animHide(fileForm, 400);
-  uploadProgress.style.display = "inline";
-  uploadProgress.value = 0.02;
-  animShow(uploadProgress, 600);
-
-  let endpoint = `${backend}/secure-urls`;
-  let params = `filetype=${encodeURIComponent(resourceFile.type)}`
-               + `&filesize=${resourceFile.size}`
-               + `&filename=${encodeURIComponent(resourceFile.name)}`;
-  let url = `${endpoint}?${params}`;
-  return fetch(url, {method:"POST"})
-    .catch(showError)
-    .then(response => response.json());
-}
-
-async function doUpload(gcsUrls) {
-  console.debug("URL GET =", gcsUrls.downloadURL);
-  qrText = gcsUrls.downloadURL;
-  console.debug("URL PUT =", gcsUrls.uploadURL);
+async function doUpload() {
   uploadProgress.style.display = "inline";
   uploadProgress.value = 0.05;
 
@@ -242,10 +221,10 @@ async function doUpload(gcsUrls) {
   // the 'progress' event.
   return new Promise(function (resolve, reject) {
     var xhr = new XMLHttpRequest();
-    xhr.open("PUT", gcsUrls.uploadURL);
+    xhr.open("POST", "/upload");
     xhr.onload = function () {
       if (this.status >= 200 && this.status < 300) {
-        resolve(xhr.response);
+        resolve(JSON.parse(xhr.response));
       } else {
         reject({
           status: this.status,
