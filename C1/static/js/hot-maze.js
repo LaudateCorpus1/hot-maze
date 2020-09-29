@@ -3,7 +3,7 @@
 // They are not representative of state-of-the-art frontend practices.
 
 
-// Workflow C1: use Cloud Storage.
+// Workflow C1: use Firestore.
 //
 // 1) The page displays a File input/Drag'n'drop zone
 // 2) The User drops a file F
