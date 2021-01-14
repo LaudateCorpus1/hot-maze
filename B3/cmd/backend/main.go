@@ -14,9 +14,7 @@ import (
 )
 
 const (
-	projectID = "hot-maze"
-	// "b1" is the version of this App Engine app
-	// "uc.r" is the app location (regional route)
+	projectID               = "hot-maze"
 	backendBaseURL          = "https://hot-maze-udtcugbenq-uc.a.run.app"
 	storageServiceAccountID = "ephemeral-storage@hot-maze.iam.gserviceaccount.com"
 	bucket                  = "hot-maze.appspot.com"
