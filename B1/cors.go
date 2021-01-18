@@ -15,7 +15,7 @@ func (s Server) accessControlAllowHotMaze(w http.ResponseWriter, r *http.Request
 		"https://hot-maze.appspot.com",
 		"https://hot-maze.uc.r.appspot.com",
 		"https://b1-dot-hot-maze.uc.r.appspot.com",
-		// For debug.
+		// For local testing.
 		"http://localhost:8080",
 		"http://localhost:8000",
 	}

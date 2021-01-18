@@ -15,9 +15,9 @@ func (s Server) accessControlAllowHotMaze(w http.ResponseWriter, r *http.Request
 	whiteList := []string{
 		"https://hotmaze.io",
 		"https://hot-maze.firebaseapp.com",
-		// For debug.
+		// For local testing.
 		"http://localhost:8080",
-		"http://localhost:8000",
+		"http://localhost:8081",
 		"",
 	}
 	for _, whiteItem := range whiteList {
