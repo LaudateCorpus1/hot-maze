@@ -27,7 +27,10 @@ func main() {
 	log.Println("GOOGLE_APPLICATION_CREDENTIALS =", os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
 	// log.Println(os.Environ())
 	cred, errCred := google.FindDefaultCredentials(ctx)
-	log.Println("FindDefaultCredentials =", string(cred.JSON), errCred)
+	log.Println("errCred =", errCred)
+	if cred != nil {
+		log.Println("FindDefaultCredentials =", string(cred.JSON))
+	}
 
 	storageClient, err := storage.NewClient(ctx)
 	if err != nil {
