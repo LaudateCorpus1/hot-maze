@@ -57,3 +57,9 @@ func B2_Get(w http.ResponseWriter, r *http.Request) {
 func B2_Forget(w http.ResponseWriter, r *http.Request) {
 	server.HandlerForgetFile(w, r)
 }
+
+// GetServer is exposed to modify the Server settings,
+// e.g. for local testing.
+func GetServer() *Server {
+	return &server
+}

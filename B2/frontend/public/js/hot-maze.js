@@ -16,6 +16,10 @@
 // Frontend (static files) and Backend (Cloud Functions) are hosted at 
 // distinct domains.
 var backend = "https://us-central1-hot-maze.cloudfunctions.net"; 
+if( window.location.host.startsWith("localhost:") ) {
+  console.log("Running in local dev mode");
+  backend = "http://localhost:8080"; 
+}
 
 let resourceFile;
 let qrText;
