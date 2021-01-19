@@ -14,7 +14,6 @@ func (s Server) accessControlAllowHotMaze(w http.ResponseWriter, r *http.Request
 	whiteList := []string{
 		"https://hotmaze.io",
 		"https://hot-maze-udtcugbenq-uc.a.run.app",
-		"https://hot-maze2-udtcugbenq-uc.a.run.app",
 		// For local testing.
 		"http://localhost:8080",
 		"http://localhost:8000",
