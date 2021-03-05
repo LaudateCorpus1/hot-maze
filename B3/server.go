@@ -31,7 +31,7 @@ type Server struct {
 }
 
 // RegisterHandlers registers the handlers
-func (s Server) RegisterHandlers() {
+func (s *Server) RegisterHandlers() {
 	// Static assets: HTML, JS, CSS
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "static/index.html")

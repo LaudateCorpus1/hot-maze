@@ -13,7 +13,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (s Server) HandlerForgetFile(w http.ResponseWriter, r *http.Request) {
+func (s *Server) HandlerForgetFile(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "POST only", http.StatusBadRequest)
 		return
@@ -37,7 +37,7 @@ func (s Server) HandlerForgetFile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s Server) ScheduleForgetFile(ctx context.Context, fileUUID string) (*taskspb.Task, error) {
+func (s *Server) ScheduleForgetFile(ctx context.Context, fileUUID string) (*taskspb.Task, error) {
 	// Adapted from https://cloud.google.com/tasks/docs/creating-http-target-tasks#go
 
 	client, err := cloudtasks.NewClient(ctx)

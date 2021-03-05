@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func (s Server) accessControlAllowHotMaze(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) accessControlAllowHotMaze(w http.ResponseWriter, r *http.Request) error {
 	origin := r.Header.Get("Origin")
 	origin = strings.TrimSpace(origin)
 

@@ -17,7 +17,7 @@ const (
 	validity = 300 * time.Second
 )
 
-func (s Server) HandlerGenerateSignedURLs(w http.ResponseWriter, r *http.Request) {
+func (s *Server) HandlerGenerateSignedURLs(w http.ResponseWriter, r *http.Request) {
 	if errCORS := s.accessControlAllowHotMaze(w, r); errCORS != nil {
 		log.Println(errCORS)
 		http.Error(w, errCORS.Error(), http.StatusBadRequest)
@@ -57,7 +57,7 @@ func (s Server) HandlerGenerateSignedURLs(w http.ResponseWriter, r *http.Request
 	})
 }
 
-func (s Server) GenerateURLs(
+func (s *Server) GenerateURLs(
 	ctx context.Context,
 	fileType string,
 	fileSize int,
@@ -92,7 +92,7 @@ func (s Server) GenerateURLs(
 // HandlerUnshortenGetURL redirects a "short" URL to a "long" signed URL.
 // Short URL has length ~80.
 // Signed download URL has length ~550.
-func (s Server) HandlerUnshortenGetURL(w http.ResponseWriter, r *http.Request) {
+func (s *Server) HandlerUnshortenGetURL(w http.ResponseWriter, r *http.Request) {
 	fileUUID := strings.TrimPrefix(r.URL.Path, "/get/")
 	objectName := "transit/" + fileUUID
 	log.Printf("Redirecting to a new download signed URL for ephemeral resource %q\n", objectName)
