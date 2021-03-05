@@ -45,4 +45,5 @@ func (s *Server) RegisterHandlers() {
 	http.HandleFunc("/secure-urls", s.HandlerGenerateSignedURLs)
 	http.HandleFunc("/get/", s.HandlerUnshortenGetURL)
 	http.HandleFunc("/forget", s.HandlerForgetFile)
+	http.HandleFunc("/term", s.HandlerDirectUpload)
 }
