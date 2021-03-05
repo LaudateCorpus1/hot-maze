@@ -50,6 +50,7 @@ func (s *Server) HandlerGenerateSignedURLs(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Problem with file allocation :(", http.StatusInternalServerError)
 		return
 	}
+	log.Printf("Scheduled deletion for file UUID %q", fileUUID)
 
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"uploadURL":   uploadURL,
