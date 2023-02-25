@@ -7,7 +7,7 @@ require (
 	cloud.google.com/go/storage v1.11.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.1.0
 	github.com/google/uuid v1.1.2
-	golang.org/x/net v0.0.0-20200904194848-62affa334b73
+	golang.org/x/net v0.7.0 // indirect
 	google.golang.org/genproto v0.0.0-20200921165018-b9da36f5f452
 	google.golang.org/protobuf v1.25.0
 )
